@@ -73,7 +73,6 @@ public class BasicTeleOp extends LinearOpMode {
         frontRight  = hardwareMap.get(DcMotor.class, "front_right");
         backRight  = hardwareMap.get(DcMotor.class, "back_right");
 
-
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -103,8 +102,8 @@ public class BasicTeleOp extends LinearOpMode {
             // Send calculated power to wheels
             frontLeft.setPower(y + x + z);
             frontRight.setPower(y - x - z);
-            backLeft.setPower(y - x + z);
-            backRight.setPower(y + x - z);
+            backLeft.setPower(y + x - z);
+            backRight.setPower(y - x + z);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
