@@ -29,11 +29,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.Methods;
+import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -41,53 +42,27 @@ import org.firstinspires.ftc.teamcode.Methods;
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- * <p>
+ *
  * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
  * It includes all the skeletal structure that all linear OpModes contain.
- * <p>
+ *
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name = "Basic: Linear OpMode", group = "Linear Opmode")
-//@Disabled
-public class BasicTeleOp extends LinearOpMode {
+@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
+@Disabled
+public class Methods extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor frontRight = null;
-    private DcMotor frontLeft = null;
-    private DcMotor backRight = null;
-    private DcMotor backLeft = null;
-    double x;
-    double y;
-    double z;
-    boolean oldSpeedToggle;
-    boolean newSpeedToggle = false;
-    double scaleFactor = 0.7;
-
-    Methods methods = new Methods();
-
+    private DcMotor leftDrive = null;
+    private DcMotor rightDrive = null;
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        frontLeft = hardwareMap.get(DcMotor.class, "front_left");
-        backLeft = hardwareMap.get(DcMotor.class, "back_left");
-        frontRight = hardwareMap.get(DcMotor.class, "front_right");
-        backRight = hardwareMap.get(DcMotor.class, "back_right");
-
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -95,38 +70,25 @@ public class BasicTeleOp extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-            /*oldSpeedToggle = newSpeedToggle;
-            newSpeedToggle = gamepad1.right_bumper;
-
-            if (!oldSpeedToggle && newSpeedToggle) {
-                if(scaleFactor == 0.7){
-                    scaleFactor = 0.3;
-                }
-                else {
-                    scaleFactor = 0.7;
-                }
-            }*/
-
-            scaleFactor = methods.toggle(gamepad1.right_bumper, 0.7, 0.3);
-
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-            x = gamepad1.left_stick_x;
-            y = gamepad1.left_stick_y;
-            z = gamepad1.right_stick_x;
-
-            // Send calculated power to wheels
-            frontLeft.setPower ((y + x + z) * scaleFactor);
-            frontRight.setPower((y - x - z) * scaleFactor);
-            backLeft.setPower  ((y + x - z) * scaleFactor);
-            backRight.setPower ((y - x + z) * scaleFactor);
-
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "frontLeft (%.2f), backLeft (%.2f)", y + x + z, y - x + z);
-            telemetry.addData("Motors", "frontRight (%.2f), backRight (%.2f)", y - x - z, y + x - z);
-            telemetry.update();
         }
+    }
+
+    public double toggle(boolean buttonPressed, double firstOption, double secondOption) {
+        boolean oldButtonPressed;
+        boolean newButtonPressed = false;
+        double itemToggled = firstOption;
+
+        oldButtonPressed = newButtonPressed;
+        newButtonPressed = buttonPressed;
+
+        if (!oldButtonPressed && newButtonPressed) {
+            if (itemToggled == firstOption) {
+                itemToggled = secondOption;
+            }
+            else {
+                itemToggled = firstOption;
+            }
+        }
+        return itemToggled;
     }
 }
