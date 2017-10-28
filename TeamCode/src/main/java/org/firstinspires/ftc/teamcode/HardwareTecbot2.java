@@ -29,10 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -40,32 +43,28 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- * <p>
+ *
  * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
  * It includes all the skeletal structure that all linear OpModes contain.
- * <p>
+ *
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name = "Basic TeleOp", group = "Linear Opmode")
-//@Disabled
-public class BasicTeleOp extends LinearOpMode {
+@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
+@Disabled
+public class HardwareTecbot2 extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    HardwareTecbot2 tecbot2 = new HardwareTecbot2();
-    Methods methods = new Methods();
-
-    double strafeX;
-    double strafeY;
-    double turn;
-    double scaleFactor = 0.7;
-
-    double lift1;
-    double lift2;
-    double grabber;
-
+    public DcMotor frontRight = null;
+    public DcMotor frontLeft = null;
+    public DcMotor backRight = null;
+    public DcMotor backLeft = null;
+    public DcMotor lift1 = null;
+    public DcMotor lift2 = null;
+    public DcMotor grabber = null;
+    public Servo   jewelServo;
 
     @Override
     public void runOpMode() {
@@ -75,26 +74,28 @@ public class BasicTeleOp extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-//        tecbot2.frontLeft  = hardwareMap.get(DcMotor.class, "front_left");
-//        tecbot2.backLeft   = hardwareMap.get(DcMotor.class, "back_left");
-//        tecbot2.frontRight = hardwareMap.get(DcMotor.class, "front_right");
-//        tecbot2.backRight  = hardwareMap.get(DcMotor.class, "back_right");
-//        tecbot2.lift1      = hardwareMap.get(DcMotor.class, "lift_1");
-//        tecbot2.lift2      = hardwareMap.get(DcMotor.class, "lift_2");
-//        tecbot2.grabber    = hardwareMap.get(DcMotor.class, "grabber");
-//        tecbot2.jewelServo = hardwareMap.get(Servo.class,   "jewel_servo");
 
+        frontLeft  = hardwareMap.get(DcMotor.class, "front_left");
+        backLeft   = hardwareMap.get(DcMotor.class, "back_left");
+        frontRight = hardwareMap.get(DcMotor.class, "front_right");
+        backRight  = hardwareMap.get(DcMotor.class, "back_right");
+        lift1      = hardwareMap.get(DcMotor.class, "lift_1");
+        lift2      = hardwareMap.get(DcMotor.class, "lift_2");
+        grabber    = hardwareMap.get(DcMotor.class, "grabber");
 
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-//        tecbot2.frontLeft.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.backLeft.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.frontRight.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.backRight.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.lift1.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.lift2.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.grabber.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.jewelServo.setPosition(-90);
+        jewelServo = hardwareMap.get(Servo.class,   "jewel_servo");
+
+        //Set direction of the motors
+
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
+        lift1.setDirection(DcMotor.Direction.FORWARD);
+        lift2.setDirection(DcMotor.Direction.FORWARD);
+        grabber.setDirection(DcMotor.Direction.FORWARD);
+
+        jewelServo.setPosition(0);
 
 
 
@@ -105,35 +106,10 @@ public class BasicTeleOp extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            tecbot2.jewelServo.setPosition(0);
-
-            lift1 = -gamepad2.left_stick_y/2;
-            lift2 = -gamepad2.right_stick_y/2;
-            grabber = -gamepad2.right_trigger/2;
-            tecbot2.jewelServo.setPosition(-90);
-
-            scaleFactor = methods.toggle(gamepad1.right_bumper, 0.7, 0.3);
-
-            strafeX = gamepad1.left_stick_x; // Forward and backward
-            strafeY = gamepad1.left_stick_y; // Side to side
-            turn = gamepad1.right_stick_x;
-
-            // Send calculated power to wheels
-            tecbot2.frontLeft.setPower ((strafeY + strafeX + turn) * scaleFactor);
-            tecbot2.frontRight.setPower((strafeY - strafeX - turn) * scaleFactor);
-            tecbot2.backLeft.setPower  ((strafeY + strafeX - turn) * scaleFactor);
-            tecbot2.backRight.setPower ((strafeY - strafeX + turn) * scaleFactor);
-
-            tecbot2.lift1.setPower(lift1);
-            tecbot2.lift2.setPower(lift2);
-            tecbot2.grabber.setPower(grabber);
-
 
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "frontLeft (%.2f), backLeft (%.2f)", strafeY + strafeX + turn, strafeY - strafeX + turn);
-            telemetry.addData("Motors", "frontRight (%.2f), backRight (%.2f)", strafeY - strafeX - turn, strafeY + strafeX - turn);
             telemetry.update();
         }
     }
