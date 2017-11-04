@@ -31,6 +31,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -48,7 +50,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name = "Basic TeleOp", group = "Linear Opmode")
+@TeleOp(name = "Basic TeleOp", group = "Tecbot 2017-18")
 //@Disabled
 public class BasicTeleOp extends LinearOpMode {
 
@@ -60,12 +62,14 @@ public class BasicTeleOp extends LinearOpMode {
     double strafeX;
     double strafeY;
     double turn;
-    double scaleFactor = 0.7;
+    boolean driveFast;
+    boolean driveSlow;
+    double driveSpeed = 0.7;
 
     double lift1;
     double lift2;
-    double grabber;
-
+    boolean grabberOpen;
+    boolean grabberClose;
 
     @Override
     public void runOpMode() {
@@ -73,28 +77,28 @@ public class BasicTeleOp extends LinearOpMode {
         telemetry.update();
 
         // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
+        // to 'get' must correspond to the names assigned durin g the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-//        tecbot2.frontLeft  = hardwareMap.get(DcMotor.class, "front_left");
-//        tecbot2.backLeft   = hardwareMap.get(DcMotor.class, "back_left");
-//        tecbot2.frontRight = hardwareMap.get(DcMotor.class, "front_right");
-//        tecbot2.backRight  = hardwareMap.get(DcMotor.class, "back_right");
-//        tecbot2.lift1      = hardwareMap.get(DcMotor.class, "lift_1");
-//        tecbot2.lift2      = hardwareMap.get(DcMotor.class, "lift_2");
-//        tecbot2.grabber    = hardwareMap.get(DcMotor.class, "grabber");
-//        tecbot2.jewelServo = hardwareMap.get(Servo.class,   "jewel_servo");
+        tecbot2.frontLeft  = hardwareMap.get(DcMotor.class, "front_left");
+        tecbot2.backLeft   = hardwareMap.get(DcMotor.class, "back_left");
+        tecbot2.frontRight = hardwareMap.get(DcMotor.class, "front_right");
+        tecbot2.backRight  = hardwareMap.get(DcMotor.class, "back_right");
+        tecbot2.lift1      = hardwareMap.get(DcMotor.class, "lift_1");
+        tecbot2.lift2      = hardwareMap.get(DcMotor.class, "lift_2");
+        tecbot2.grabber    = hardwareMap.get(DcMotor.class, "grabber");
+        tecbot2.jewelServo = hardwareMap.get(Servo.class,   "jewel_servo");
 
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-//        tecbot2.frontLeft.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.backLeft.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.frontRight.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.backRight.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.lift1.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.lift2.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.grabber.setDirection(DcMotor.Direction.FORWARD);
-//        tecbot2.jewelServo.setPosition(-90);
+        tecbot2.frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        tecbot2.backLeft.setDirection(DcMotor.Direction.REVERSE);
+        tecbot2.frontRight.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.backRight.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.lift1.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.lift2.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
+        tecbot2.jewelServo.setPosition(-90); // might be redundant, used in autonomous
 
 
 
@@ -105,30 +109,44 @@ public class BasicTeleOp extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            tecbot2.jewelServo.setPosition(0);
-
             lift1 = -gamepad2.left_stick_y/2;
             lift2 = -gamepad2.right_stick_y/2;
-            grabber = -gamepad2.right_trigger/2;
-            tecbot2.jewelServo.setPosition(-90);
+            grabberOpen = gamepad2.right_bumper;
+            grabberClose = gamepad2.left_bumper;
 
-            scaleFactor = methods.toggle(gamepad1.right_bumper, 0.7, 0.3);
+            driveFast = gamepad1.right_bumper;
+            driveSlow = gamepad1.left_bumper;
+
+            if     (driveFast && !driveSlow){
+                driveSpeed = 0.7;
+            }
+            else if(!driveFast && driveSlow){
+                driveSpeed = 0.3;
+            }
+            else if(driveFast && driveSlow || !driveFast && !grabberClose){}
 
             strafeX = gamepad1.left_stick_x; // Forward and backward
             strafeY = gamepad1.left_stick_y; // Side to side
             turn = gamepad1.right_stick_x;
 
+            if     (grabberOpen && !grabberClose){
+                tecbot2.grabber.setPower(0.25);
+            }
+            else if(!grabberOpen && grabberClose){
+                tecbot2.grabber.setPower(-0.25);
+            }
+            else if(grabberOpen && grabberClose || !grabberOpen && !grabberClose){
+                tecbot2.grabber.setPower(0);
+            }
+
             // Send calculated power to wheels
-            tecbot2.frontLeft.setPower ((strafeY + strafeX + turn) * scaleFactor);
-            tecbot2.frontRight.setPower((strafeY - strafeX - turn) * scaleFactor);
-            tecbot2.backLeft.setPower  ((strafeY + strafeX - turn) * scaleFactor);
-            tecbot2.backRight.setPower ((strafeY - strafeX + turn) * scaleFactor);
+            tecbot2.frontLeft.setPower ((strafeY - strafeX + turn) * driveSpeed);
+            tecbot2.frontRight.setPower((strafeY + strafeX - turn) * driveSpeed);
+            tecbot2.backLeft.setPower  ((strafeY + strafeX + turn) * driveSpeed);
+            tecbot2.backRight.setPower ((strafeY - strafeX - turn) * driveSpeed);
 
             tecbot2.lift1.setPower(lift1);
             tecbot2.lift2.setPower(lift2);
-            tecbot2.grabber.setPower(grabber);
-
-
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());

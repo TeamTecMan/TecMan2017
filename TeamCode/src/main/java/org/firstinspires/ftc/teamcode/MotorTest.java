@@ -32,6 +32,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -40,21 +42,21 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- *
+ * <p>
  * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
  * It includes all the skeletal structure that all linear OpModes contain.
- *
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Motor Test", group="Tests")
+@TeleOp(name = "Motor Test", group = "Tests")
 //@Disabled
 public class MotorTest extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    HardwareTecbot2 tecbot2 = new HardwareTecbot2();
+    //HardwareTecbot2 tecbot2 = new HardwareTecbot2();
     Methods methods = new Methods();
 
     boolean frontLeftRun;
@@ -62,13 +64,27 @@ public class MotorTest extends LinearOpMode {
     boolean frontRightRun;
     boolean backRightRun;
 
-    double driveSpeed;
+    double driveSpeed = 0.7;
+
+    public DcMotor frontLeft = null;
+    public DcMotor frontRight = null;
+    public DcMotor backRight = null;
+    public DcMotor backLeft = null;
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        frontLeft = hardwareMap.get(DcMotor.class, "front_left");
+        backLeft = hardwareMap.get(DcMotor.class, "back_left");
+        frontRight = hardwareMap.get(DcMotor.class, "front_right");
+        backRight = hardwareMap.get(DcMotor.class, "back_right");
+
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -82,19 +98,32 @@ public class MotorTest extends LinearOpMode {
             frontRightRun = gamepad1.b;
             backRightRun = gamepad1.a;
 
-            driveSpeed = methods.toggle(gamepad1.right_bumper,0.7,0.3);
+            driveSpeed = methods.toggle(gamepad1.right_bumper, 0.7, 0.3);
 
-            if(frontLeftRun){
-                tecbot2.frontLeft.setPower(driveSpeed);
+            if (frontLeftRun) {
+                frontLeft.setPower(driveSpeed);
             }
-            if(backLeftRun){
-                tecbot2.frontLeft.setPower(driveSpeed);
+            if (backLeftRun) {
+                backLeft.setPower(driveSpeed);
             }
-            if(frontRightRun){
-                tecbot2.frontLeft.setPower(driveSpeed);
+            if (frontRightRun) {
+                frontRight.setPower(driveSpeed);
             }
-            if(backRightRun){
-                tecbot2.frontLeft.setPower(driveSpeed);
+            if (backRightRun) {
+                backRight.setPower(driveSpeed);
+            }
+
+            if (!frontLeftRun){
+                frontLeft.setPower(0);
+            }
+            if (!backLeftRun){
+                backLeft.setPower(0);
+            }
+            if (!frontRightRun){
+                frontRight.setPower(0);
+            }
+            if (!backRightRun){
+                backRight.setPower(0);
             }
 
             // Show the elapsed game time and wheel power.

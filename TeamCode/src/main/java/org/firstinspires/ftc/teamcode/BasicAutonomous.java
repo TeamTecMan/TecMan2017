@@ -31,11 +31,12 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
 
 
 /**
@@ -51,53 +52,28 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Linear OpMode", group="Tecbot 2017-18")
-@Disabled
-public class HardwareTecbot2 extends LinearOpMode {
+@Autonomous(name="Basic: Linear OpMode", group="Linear Opmode")
+//@Disabled
+public class BasicAutonomous extends LinearOpMode {
 
     // Declare OpMode members.
+    HardwareTecbot2 tecbot2 = new HardwareTecbot2();
     private ElapsedTime runtime = new ElapsedTime();
-    public DcMotor frontRight = null;
-    public DcMotor frontLeft = null;
-    public DcMotor backRight = null;
-    public DcMotor backLeft = null;
-    public DcMotor lift1 = null;
-    public DcMotor lift2 = null;
-    public DcMotor grabber = null;
-    public Servo   jewelServo;
+    Methods methods = new Methods();
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-
-        frontLeft  = hardwareMap.get(DcMotor.class, "front_left");
-        backLeft   = hardwareMap.get(DcMotor.class, "back_left");
-        frontRight = hardwareMap.get(DcMotor.class, "front_right");
-        backRight  = hardwareMap.get(DcMotor.class, "back_right");
-        lift1      = hardwareMap.get(DcMotor.class, "lift_1");
-        lift2      = hardwareMap.get(DcMotor.class, "lift_2");
-        grabber    = hardwareMap.get(DcMotor.class, "grabber");
-
-        jewelServo = hardwareMap.get(Servo.class,   "jewel_servo");
-
-        //Set direction of the motors
-
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
-        lift1.setDirection(DcMotor.Direction.FORWARD);
-        lift2.setDirection(DcMotor.Direction.FORWARD);
-        grabber.setDirection(DcMotor.Direction.FORWARD);
-
-        jewelServo.setPosition(0);
-
-
+        tecbot2.frontLeft  = hardwareMap.get(DcMotor.class, "front_left");
+        tecbot2.backLeft   = hardwareMap.get(DcMotor.class, "back_left");
+        tecbot2.frontRight = hardwareMap.get(DcMotor.class, "front_right");
+        tecbot2.backRight  = hardwareMap.get(DcMotor.class, "back_right");
+        tecbot2.lift1      = hardwareMap.get(DcMotor.class, "lift_1");
+        tecbot2.lift2      = hardwareMap.get(DcMotor.class, "lift_2");
+        tecbot2.grabber    = hardwareMap.get(DcMotor.class, "grabber");
+        tecbot2.jewelServo = hardwareMap.get(Servo.class,   "jewel_servo");
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -107,9 +83,9 @@ public class HardwareTecbot2 extends LinearOpMode {
         while (opModeIsActive()) {
 
 
-
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            //telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.update();
         }
     }
