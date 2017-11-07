@@ -59,6 +59,9 @@ public class BasicTeleOp extends LinearOpMode {
     HardwareTecbot2 tecbot2 = new HardwareTecbot2();
     Methods methods = new Methods();
 
+    static final double STRAFE_MULTIPLIER = 1.5;
+    static final double TURN_MULTIPLIER   = 0.75;
+
     double strafeX;
     double strafeY;
     double turn;
@@ -90,7 +93,7 @@ public class BasicTeleOp extends LinearOpMode {
 
 
         // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
+        // Reverse the motors that runs backwards when connected directly to the battery
         tecbot2.frontLeft.setDirection(DcMotor.Direction.REVERSE);
         tecbot2.backLeft.setDirection(DcMotor.Direction.REVERSE);
         tecbot2.frontRight.setDirection(DcMotor.Direction.FORWARD);
@@ -98,7 +101,7 @@ public class BasicTeleOp extends LinearOpMode {
         tecbot2.lift1.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.lift2.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
-        tecbot2.jewelServo.setPosition(-90); // might be redundant, used in autonomous
+        tecbot2.jewelServo.setPosition(0); // might be redundant, used in autonomous
 
 
 
@@ -140,10 +143,10 @@ public class BasicTeleOp extends LinearOpMode {
             }
 
             // Send calculated power to wheels
-            tecbot2.frontLeft.setPower ((strafeY - strafeX + turn) * driveSpeed);
-            tecbot2.frontRight.setPower((strafeY + strafeX - turn) * driveSpeed);
-            tecbot2.backLeft.setPower  ((strafeY + strafeX + turn) * driveSpeed);
-            tecbot2.backRight.setPower ((strafeY - strafeX - turn) * driveSpeed);
+            tecbot2.frontLeft.setPower (((strafeY * STRAFE_MULTIPLIER) - (strafeX * STRAFE_MULTIPLIER) + (turn * TURN_MULTIPLIER)) * driveSpeed);
+            tecbot2.frontRight.setPower(((strafeY * STRAFE_MULTIPLIER) + (strafeX * STRAFE_MULTIPLIER) - (turn * TURN_MULTIPLIER)) * driveSpeed);
+            tecbot2.backLeft.setPower  (((strafeY * STRAFE_MULTIPLIER) + (strafeX * STRAFE_MULTIPLIER) + (turn * TURN_MULTIPLIER)) * driveSpeed);
+            tecbot2.backRight.setPower (((strafeY * STRAFE_MULTIPLIER) - (strafeX * STRAFE_MULTIPLIER) - (turn * TURN_MULTIPLIER)) * driveSpeed);
 
             tecbot2.lift1.setPower(lift1);
             tecbot2.lift2.setPower(lift2);

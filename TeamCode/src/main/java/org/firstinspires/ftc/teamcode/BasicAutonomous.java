@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -61,6 +62,8 @@ public class BasicAutonomous extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     Methods methods = new Methods();
 
+    String teamColor = "blue";
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -74,19 +77,86 @@ public class BasicAutonomous extends LinearOpMode {
         tecbot2.lift2      = hardwareMap.get(DcMotor.class, "lift_2");
         tecbot2.grabber    = hardwareMap.get(DcMotor.class, "grabber");
         tecbot2.jewelServo = hardwareMap.get(Servo.class,   "jewel_servo");
+        tecbot2.jewelSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "jewel_sensor");
+
+        // Most robots need the motor on one side to be reversed to drive forward
+        // Reverse the motors that runs backwards when connected directly to the battery
+        tecbot2.frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        tecbot2.backLeft.setDirection(DcMotor.Direction.REVERSE);
+        tecbot2.frontRight.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.backRight.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.lift1.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.lift2.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
+        tecbot2.jewelServo.setPosition(90); // might be redundant, used in autonomous
+
+        if(gamepad1.x){teamColor = "blue";}
+        if(gamepad1.b){teamColor = "red";}
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
+        //tecbot2.backRight.setPower(1.5);
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+            knockJewels(0);
+            knockJewels(90);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             //telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.update();
         }
+        tecbot2.frontLeft.setPower(0);
+        tecbot2.backLeft.setPower(0);
+        tecbot2.frontRight.setPower(0);
+        tecbot2.backRight.setPower(0);
+        tecbot2.lift1.setPower(0);
+        tecbot2.lift2.setPower(0);
+        tecbot2.grabber.setPower(0);
     }
+
+    public void knockJewels(double servoPosition){
+        tecbot2.jewelServo.setPosition(servoPosition);
+
+        if(tecbot2.jewelSensor.red() > tecbot2.jewelSensor.blue()){
+            if(teamColor == ""){
+
+            }
+            if(teamColor == ""){
+
+            }
+        }
+        else if(tecbot2.jewelSensor.blue() > tecbot2.jewelSensor.red()){
+            if(teamColor == ""){
+
+            }
+            if(teamColor == ""){
+
+            }
+        }
+
+    }
+    public void pivotRobotByTime(String turnDirection, double time, double power){
+        //getRuntime()
+        //.while(Runtime != 4)
+        turnDirection = "right";
+
+        if(turnDirection == "right"){
+            tecbot2.frontLeft.setPower(power);
+            tecbot2.backLeft.setPower(power);
+            tecbot2.frontRight.setPower(-power);
+            tecbot2.backRight.setPower(-power);
+        }
+        if(turnDirection == "right"){
+            tecbot2.frontLeft.setPower(-power);
+            tecbot2.backLeft.setPower(-power);
+            tecbot2.frontRight.setPower(power);
+            tecbot2.backRight.setPower(power);
+        }
+    }
+    public void pivotRobot(String turnDirection,){}
 }
