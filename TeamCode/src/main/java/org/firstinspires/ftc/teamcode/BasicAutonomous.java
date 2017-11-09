@@ -88,7 +88,7 @@ public class BasicAutonomous extends LinearOpMode {
         tecbot2.lift1.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.lift2.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
-        tecbot2.jewelServo.setPosition(90); // might be redundant, used in autonomous
+        tecbot2.jewelServo.setPosition(-90); // might be redundant, used in autonomous
 
         if(gamepad1.x){teamColor = "blue";}
         if(gamepad1.b){teamColor = "red";}
@@ -97,13 +97,11 @@ public class BasicAutonomous extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        //tecbot2.backRight.setPower(1.5);
+        knockJewels(180);
+
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-            knockJewels(0);
-            knockJewels(90);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -123,40 +121,57 @@ public class BasicAutonomous extends LinearOpMode {
         tecbot2.jewelServo.setPosition(servoPosition);
 
         if(tecbot2.jewelSensor.red() > tecbot2.jewelSensor.blue()){
-            if(teamColor == ""){
-
+            if(teamColor.equals("blue")){
+                pivotRobotByTime("left", 0.5, 0.5);
             }
-            if(teamColor == ""){
-
+            if(teamColor.equals("red")){
+                pivotRobotByTime("right", 0.5, 0.5);
             }
         }
         else if(tecbot2.jewelSensor.blue() > tecbot2.jewelSensor.red()){
-            if(teamColor == ""){
-
+            if(teamColor.equals("blue")){
+                pivotRobotByTime("right", 0.5, 0.5);
             }
-            if(teamColor == ""){
-
+            if(teamColor.equals("red")){
+                pivotRobotByTime("left", 0.5, 0.5);
             }
         }
-
+        tecbot2.jewelServo.setPosition(90);
     }
+
     public void pivotRobotByTime(String turnDirection, double time, double power){
-        //getRuntime()
-        //.while(Runtime != 4)
+        double startTime = getRuntime();
+        double currentTime = getRuntime();
         turnDirection = "right";
 
-        if(turnDirection == "right"){
-            tecbot2.frontLeft.setPower(power);
-            tecbot2.backLeft.setPower(power);
-            tecbot2.frontRight.setPower(-power);
-            tecbot2.backRight.setPower(-power);
-        }
-        if(turnDirection == "right"){
-            tecbot2.frontLeft.setPower(-power);
-            tecbot2.backLeft.setPower(-power);
-            tecbot2.frontRight.setPower(power);
-            tecbot2.backRight.setPower(power);
+        while(currentTime - startTime < time) {
+            currentTime = getRuntime();
+
+            if (turnDirection == "right") {
+                tecbot2.frontLeft.setPower(power);
+                tecbot2.backLeft.setPower(power);
+                tecbot2.frontRight.setPower(-power);
+                tecbot2.backRight.setPower(-power);
+            }
+            if (turnDirection == "left") {
+                tecbot2.frontLeft.setPower(-power);
+                tecbot2.backLeft.setPower(-power);
+                tecbot2.frontRight.setPower(power);
+                tecbot2.backRight.setPower(power);
+            }
         }
     }
-    public void pivotRobot(String turnDirection,){}
+    public void driveByTime(double time, double leftFrontPower, double leftBackPower, double rightFrontPower, double rightBackPower){
+        double startTime = getRuntime();
+        double currentTime = getRuntime();
+
+        while(currentTime - startTime < time) {
+            currentTime = getRuntime();
+            tecbot2.frontLeft.setPower(leftFrontPower);
+            tecbot2.backLeft.setPower(leftBackPower);
+            tecbot2.frontRight.setPower(rightFrontPower);
+            tecbot2.backRight.setPower(rightBackPower);
+        }
+    }
+    public void pivotRobot(String turnDirection){}
 }

@@ -101,7 +101,7 @@ public class BasicTeleOp extends LinearOpMode {
         tecbot2.lift1.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.lift2.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
-        tecbot2.jewelServo.setPosition(0); // might be redundant, used in autonomous
+//       tecbot2.jewelServo.setPosition(); // might be redundant, used in autonomous
 
 
 
@@ -126,11 +126,11 @@ public class BasicTeleOp extends LinearOpMode {
             else if(!driveFast && driveSlow){
                 driveSpeed = 0.3;
             }
-            else if(driveFast && driveSlow || !driveFast && !grabberClose){}
+            else if(driveFast && driveSlow || !driveFast && !driveSlow){}
 
             strafeX = gamepad1.left_stick_x; // Forward and backward
             strafeY = gamepad1.left_stick_y; // Side to side
-            turn = gamepad1.right_stick_x;
+            turn = -gamepad1.right_stick_x;
 
             if     (grabberOpen && !grabberClose){
                 tecbot2.grabber.setPower(0.25);
