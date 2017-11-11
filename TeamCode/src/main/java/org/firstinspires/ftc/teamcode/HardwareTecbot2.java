@@ -29,10 +29,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -65,6 +67,7 @@ public class HardwareTecbot2 extends LinearOpMode {
     public DcMotor lift2 = null;
     public DcMotor grabber = null;
     public Servo   jewelServo;
+    public ModernRoboticsI2cColorSensor jewelSensor;
 
     @Override
     public void runOpMode() {
@@ -82,8 +85,8 @@ public class HardwareTecbot2 extends LinearOpMode {
         lift1      = hardwareMap.get(DcMotor.class, "lift_1");
         lift2      = hardwareMap.get(DcMotor.class, "lift_2");
         grabber    = hardwareMap.get(DcMotor.class, "grabber");
-
         jewelServo = hardwareMap.get(Servo.class,   "jewel_servo");
+        jewelSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "jewel_sensor");
 
         //Set direction of the motors
 
