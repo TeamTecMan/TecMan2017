@@ -133,6 +133,7 @@ public class BasicAutonomous extends LinearOpMode {
         double pivotTime  = 2; //In seconds
         double pivotPower = 0.2;
 
+        tecbot2.jewelSensor.enableLed(true);
         if(opModeIsActive()) {
             tecbot2.jewelServo.setPosition(servoDownPos);
 
@@ -155,6 +156,7 @@ public class BasicAutonomous extends LinearOpMode {
         if(opModeIsActive()) {
             tecbot2.jewelServo.setPosition(servoUpPos);
         }
+        tecbot2.jewelSensor.enableLed(false);
     }
 
     public void pivotRobotByTime(String turnDirection, double time, double power){
