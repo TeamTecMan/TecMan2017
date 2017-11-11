@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -101,13 +102,12 @@ public class BasicTeleOp extends LinearOpMode {
         tecbot2.lift1.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.lift2.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
-//       tecbot2.jewelServo.setPosition(); // might be redundant, used in autonomous
-
-
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+
+        //tecbot2.jewelServo.setPosition(); // might be redundant, used in autonomous
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
