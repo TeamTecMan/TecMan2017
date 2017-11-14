@@ -30,13 +30,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -51,9 +49,9 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Tournament Autonomous", group="Linear Opmode")
+@Autonomous(name="drive Autonomous", group="Linear Opmode")
 //@Disabled
-public class BasicAutonomous extends LinearOpMode {
+public class DriveAutonomous extends LinearOpMode {
 
     // Declare OpMode members.
     HardwareTecbot2 tecbot2 = new HardwareTecbot2();
@@ -92,34 +90,34 @@ public class BasicAutonomous extends LinearOpMode {
         tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
         //tecbot2.jewelServo.setPosition(servoUpPos);
 
-        while(!isStarted()) {
-            //Setting team color
-            if (gamepad1.x) {
-                teamColor = "blue";
-            }
-            if (gamepad1.b) {
-                teamColor = "red";
-            }
-            jewelServoPos = tecbot2.jewelServo.getPosition();
-            telemetry.addData("Jewel Servo Pos: ",jewelServoPos);
-            telemetry.addData("Team Color: ", teamColor);
-            telemetry.update();
-        }
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        knockJewels();
 
+        tecbot2.frontLeft.setPower(0.25);
+        tecbot2.backLeft.setPower(0.25);
+        tecbot2.frontRight.setPower(0.25);
+        tecbot2.backRight.setPower(0.25);
+        tecbot2.lift1.setPower(0);
+        tecbot2.lift2.setPower(0);
+        tecbot2.grabber.setPower(0);
         // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            //telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-            telemetry.update();
-        }
+        sleep(3000);
+        tecbot2.frontLeft.setPower(0);
+        tecbot2.backLeft.setPower(0);
+        tecbot2.frontRight.setPower(0);
+        tecbot2.backRight.setPower(0);
+        tecbot2.lift1.setPower(0);
+        tecbot2.lift2.setPower(0);
+        tecbot2.grabber.setPower(0);
+        sleep(1000);
+        tecbot2.frontLeft.setPower(-0.25);
+        tecbot2.backLeft.setPower(-0.25);
+        tecbot2.frontRight.setPower(-0.25);
+        tecbot2.backRight.setPower(-0.25);
+        sleep(250);
         tecbot2.frontLeft.setPower(0);
         tecbot2.backLeft.setPower(0);
         tecbot2.frontRight.setPower(0);

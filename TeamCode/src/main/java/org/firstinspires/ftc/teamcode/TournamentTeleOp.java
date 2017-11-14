@@ -110,6 +110,14 @@ public class TournamentTeleOp extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        tecbot2.frontLeft.setPower(0);
+        tecbot2.backLeft.setPower(0);
+        tecbot2.frontRight.setPower(0);
+        tecbot2.backRight.setPower(0);
+        tecbot2.lift1.setPower(0);
+        tecbot2.lift2.setPower(0);
+        tecbot2.grabber.setPower(0);
+
         tecbot2.jewelServo.setPosition(servoUpPos);
 
         // run until the end of the match (driver presses STOP)
