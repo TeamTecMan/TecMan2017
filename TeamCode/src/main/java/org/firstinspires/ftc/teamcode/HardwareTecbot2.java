@@ -98,10 +98,6 @@ public class HardwareTecbot2 extends LinearOpMode {
         lift2.setDirection(DcMotor.Direction.FORWARD);
         grabber.setDirection(DcMotor.Direction.FORWARD);
 
-        jewelServo.setPosition(0);
-
-
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();

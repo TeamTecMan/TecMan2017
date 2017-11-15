@@ -138,8 +138,8 @@ public class TournamentTeleOp extends LinearOpMode {
                 driveSpeed = 0.3;
             }
 
-            strafeX = gamepad1.left_stick_x; // Forward and backward
-            strafeY = gamepad1.left_stick_y; // Side to side
+            strafeX = gamepad1.left_stick_x; // Side to side
+            strafeY = gamepad1.left_stick_y; // Forward and backward
             turn = -gamepad1.right_stick_x;
 
             if     (grabberOpen && !grabberClose){

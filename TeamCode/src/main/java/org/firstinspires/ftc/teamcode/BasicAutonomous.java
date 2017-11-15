@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -63,7 +64,7 @@ public class BasicAutonomous extends LinearOpMode {
     String teamColor = "blue";
 
     double servoUpPos   = 0.25; // Range of 0-1 (0.25 best position)
-    double servoDownPos = 1; // Range of 0-1 (1 best position)
+    double servoDownPos = 0.95; // Range of 0-1 (1 best position)
     double jewelServoPos;
 
     @Override
@@ -83,14 +84,14 @@ public class BasicAutonomous extends LinearOpMode {
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motors that runs backwards when connected directly to the battery
-        tecbot2.frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        tecbot2.backLeft.setDirection(DcMotor.Direction.REVERSE);
-        tecbot2.frontRight.setDirection(DcMotor.Direction.FORWARD);
-        tecbot2.backRight.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.backLeft.setDirection(DcMotor.Direction.FORWARD);
+        tecbot2.frontRight.setDirection(DcMotor.Direction.REVERSE);
+        tecbot2.backRight.setDirection(DcMotor.Direction.REVERSE);
         tecbot2.lift1.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.lift2.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
-        //tecbot2.jewelServo.setPosition(servoUpPos);
+        tecbot2.jewelServo.setPosition(servoUpPos);
 
         while(!isStarted()) {
             //Setting team color
@@ -130,29 +131,45 @@ public class BasicAutonomous extends LinearOpMode {
     }
 
     public void knockJewels(){
-        double pivotTime  = 2; //In seconds
+        double pivotTime  = 0.15; //In seconds
         double pivotPower = 0.2;
 
         tecbot2.jewelSensor.enableLed(true);
         if(opModeIsActive()) {
             tecbot2.jewelServo.setPosition(servoDownPos);
 
+            pivotRobotByTime("clockwise", 10, 0.1);
+
+            sleep(5000);
+
+            while((tecbot2.jewelSensor.red() > tecbot2.jewelSensor.blue()) == false &&
+                  (tecbot2.jewelSensor.blue() > tecbot2.jewelSensor.red()) == false){
+                pivotRobotByTime("clockwise", 0.01, 0.1);
+            }
+
             if (tecbot2.jewelSensor.red() > tecbot2.jewelSensor.blue()) {
                 if (teamColor.equals("blue")) {
-                    pivotRobotByTime("left", pivotTime, pivotPower);
+                    pivotRobotByTime("cClockwise", pivotTime, pivotPower);
+                    telemetry.addData("Sensor Color: ", "blue");
                 }
                 if (teamColor.equals("red")) {
-                    pivotRobotByTime("right", pivotTime, pivotPower);
+                    pivotRobotByTime("clockwise", pivotTime, pivotPower);
+                    telemetry.addData("Sensor Color: ", "blue");
                 }
             } else if (tecbot2.jewelSensor.blue() > tecbot2.jewelSensor.red()) {
                 if (teamColor.equals("blue")) {
-                    pivotRobotByTime("right", pivotTime, pivotPower);
+                    pivotRobotByTime("clockwise", pivotTime, pivotPower);
+                    telemetry.addData("Sensor Color: ", "red");
                 }
                 if (teamColor.equals("red")) {
-                    pivotRobotByTime("left", pivotTime, pivotPower);
+                    pivotRobotByTime("cClockwise", pivotTime, pivotPower);
+                    telemetry.addData("Sensor Color: ", "red");
                 }
             }
         }
+
+        sleep(5000);
+
         if(opModeIsActive()) {
             tecbot2.jewelServo.setPosition(servoUpPos);
         }
@@ -163,13 +180,13 @@ public class BasicAutonomous extends LinearOpMode {
         double currentTime = getRuntime();
 
         if(opModeIsActive()) {
-            if (turnDirection == "right") {
+            if (turnDirection.equals("clockwise")) {
                 tecbot2.frontLeft.setPower(power);
                 tecbot2.backLeft.setPower(power);
                 tecbot2.frontRight.setPower(-power);
                 tecbot2.backRight.setPower(-power);
             }
-            if (turnDirection == "left") {
+            else if (turnDirection.equals("cClockwise")) {
                 tecbot2.frontLeft.setPower(-power);
                 tecbot2.backLeft.setPower(-power);
                 tecbot2.frontRight.setPower(power);
