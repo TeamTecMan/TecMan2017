@@ -60,30 +60,30 @@ public class BasicAutonomous extends LinearOpMode {
     // Declare OpMode members.
     HardwareTecbot2 tecbot2 = new HardwareTecbot2();
     private ElapsedTime runtime = new ElapsedTime(); //Time is in seconds
-    Methods methods = new Methods();
+    //Methods methods = new Methods();
 
     String teamColor = "blue";
 
-    double servoUpPos   = 0.25; // Range of 0-1 (0.25 best position)
+    double servoUpPos = 0.25; // Range of 0-1 (0.25 best position)
     double servoDownPos = 0.95; // Range of 0-1 (1 best position)
     double jewelServoPos;
-    ModernRoboticsI2cGyro tecbot2Gyro = null;        // Additional Gyro device
+    ModernRoboticsI2cGyro tecbot2Gyro = null; // Additional Gyro device
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
-        tecbot2.frontLeft   = hardwareMap.get(DcMotor.class, "front_left");
-        tecbot2.backLeft    = hardwareMap.get(DcMotor.class, "back_left");
-        tecbot2.frontRight  = hardwareMap.get(DcMotor.class, "front_right");
-        tecbot2.backRight   = hardwareMap.get(DcMotor.class, "back_right");
-        tecbot2.lift1       = hardwareMap.get(DcMotor.class, "lift_1");
-        tecbot2.lift2       = hardwareMap.get(DcMotor.class, "lift_2");
-        tecbot2.grabber     = hardwareMap.get(DcMotor.class, "grabber");
-        tecbot2.jewelServo  = hardwareMap.get(Servo.class,   "jewel_servo");
+        tecbot2.frontLeft = hardwareMap.get(DcMotor.class, "front_left");
+        tecbot2.backLeft = hardwareMap.get(DcMotor.class, "back_left");
+        tecbot2.frontRight = hardwareMap.get(DcMotor.class, "front_right");
+        tecbot2.backRight = hardwareMap.get(DcMotor.class, "back_right");
+        tecbot2.lift1 = hardwareMap.get(DcMotor.class, "lift_1");
+        tecbot2.lift2 = hardwareMap.get(DcMotor.class, "lift_2");
+        tecbot2.grabber = hardwareMap.get(DcMotor.class, "grabber");
+        tecbot2.jewelServo = hardwareMap.get(Servo.class, "jewel_servo");
         tecbot2.jewelSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "jewel_sensor");
-        tecbot2Gyro         = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
+        tecbot2Gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
         // tecbot2Gyro requires a different form of defining
         // because ModernRobotics gyro has more options when defined this way
 
@@ -99,8 +99,11 @@ public class BasicAutonomous extends LinearOpMode {
         tecbot2.jewelServo.setPosition(servoUpPos);
 
         // initialize gyro
+        telemetry.addData("Status: ", "preparing to calibrate gyro");
+        telemetry.update();
+
         tecbot2Gyro.calibrate();
-        while (tecbot2Gyro.isCalibrating()){
+        while (tecbot2Gyro.isCalibrating()) {
             sleep(50);
             telemetry.addData("Status: ", "Calibrating Gyro");
             telemetry.update();
@@ -109,7 +112,7 @@ public class BasicAutonomous extends LinearOpMode {
         telemetry.update();
 
 
-        while(!isStarted()) {
+        while (!isStarted()) {
             //Setting team color
             if (gamepad1.x) {
                 teamColor = "blue";
@@ -118,7 +121,7 @@ public class BasicAutonomous extends LinearOpMode {
                 teamColor = "red";
             }
             jewelServoPos = tecbot2.jewelServo.getPosition();
-            telemetry.addData("Jewel Servo Pos: ",jewelServoPos);
+            telemetry.addData("Jewel Servo Pos: ", jewelServoPos);
             telemetry.addData("Team Color: ", teamColor);
             telemetry.addData("Gyro Heading: ", tecbot2Gyro.getIntegratedZValue());
             telemetry.update();
@@ -128,15 +131,19 @@ public class BasicAutonomous extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        gyroDriveByTime(0.25, 120, 0, 0.025);
+
         //todo grab glyph
         //todo lift glyph
 
         knockJewels();
 
+        sleep(5000);
+
         //Split code into 2 teams
-        if (teamColor.equals("blue")){
+        if (teamColor.equals("blue")) {
             // turn to cryptobox
-            pivotRobotByGyro("cClockwise", 90, 0.25);
+            pivotRobotByGyro("cClockwise", 85, 0.1);
             //todo drive off platform
             //todo drop glyph
             //todo push glyph into cryptobox
@@ -145,7 +152,7 @@ public class BasicAutonomous extends LinearOpMode {
 
         if (teamColor.equals("red")) {
             // turn to cryptobox
-            pivotRobotByGyro("clockwise", -90, 0.25);
+            pivotRobotByGyro("clockwise", -85, 0.1);
 
             //todo drive off platform
             //todo drop glyph
@@ -171,39 +178,39 @@ public class BasicAutonomous extends LinearOpMode {
         tecbot2.grabber.setPower(0);
     }
 
-    public void knockJewels(){
-        double pivotTime  = 0.15; //In seconds
+    public void knockJewels() {
+        double pivotTime = 0.15; //In seconds
         double pivotPower = 0.2;
 
         tecbot2.jewelSensor.enableLed(true);
-        if(opModeIsActive()) {
+        if (opModeIsActive()) {
             tecbot2.jewelServo.setPosition(servoDownPos);
-
-            pivotRobotByTime("clockwise", 10, 0.1);
 
             sleep(5000);
 
-            while((tecbot2.jewelSensor.red() > tecbot2.jewelSensor.blue()) == false &&
-                  (tecbot2.jewelSensor.blue() > tecbot2.jewelSensor.red()) == false){
-                pivotRobotByTime("clockwise", 0.01, 0.1);
+            while ((tecbot2.jewelSensor.red() > tecbot2.jewelSensor.blue()) == false &&
+                    (tecbot2.jewelSensor.blue() > tecbot2.jewelSensor.red()) == false) {
+                pivotRobotByTime("clockwise", 0.005, 0.1);
             }
+
+            sleep(5000);
 
             if (tecbot2.jewelSensor.red() > tecbot2.jewelSensor.blue()) {
                 if (teamColor.equals("blue")) {
-                    pivotRobotByTime("cClockwise", pivotTime, pivotPower);
+                    pivotRobotByTime("clockwise", pivotTime, pivotPower);
                     telemetry.addData("Sensor Color: ", "blue");
                 }
                 if (teamColor.equals("red")) {
-                    pivotRobotByTime("clockwise", pivotTime, pivotPower);
+                    pivotRobotByTime("cClockwise", pivotTime, pivotPower);
                     telemetry.addData("Sensor Color: ", "blue");
                 }
             } else if (tecbot2.jewelSensor.blue() > tecbot2.jewelSensor.red()) {
                 if (teamColor.equals("blue")) {
-                    pivotRobotByTime("clockwise", pivotTime, pivotPower);
+                    pivotRobotByTime("cClockwise", pivotTime, pivotPower);
                     telemetry.addData("Sensor Color: ", "red");
                 }
                 if (teamColor.equals("red")) {
-                    pivotRobotByTime("cClockwise", pivotTime, pivotPower);
+                    pivotRobotByTime("clockwise", pivotTime, pivotPower);
                     telemetry.addData("Sensor Color: ", "red");
                 }
             }
@@ -211,23 +218,22 @@ public class BasicAutonomous extends LinearOpMode {
 
         sleep(5000);
 
-        if(opModeIsActive()) {
+        if (opModeIsActive()) {
             tecbot2.jewelServo.setPosition(servoUpPos);
         }
     }
 
-    public void pivotRobotByTime(String turnDirection, double time, double power){
+    public void pivotRobotByTime(String turnDirection, double time, double power) {
         double startTime = getRuntime();
         double currentTime = getRuntime();
 
-        if(opModeIsActive()) {
+        if (opModeIsActive()) {
             if (turnDirection.equals("clockwise")) {
                 tecbot2.frontLeft.setPower(power);
                 tecbot2.backLeft.setPower(power);
                 tecbot2.frontRight.setPower(-power);
                 tecbot2.backRight.setPower(-power);
-            }
-            else if (turnDirection.equals("cClockwise")) {
+            } else if (turnDirection.equals("cClockwise")) {
                 tecbot2.frontLeft.setPower(-power);
                 tecbot2.backLeft.setPower(-power);
                 tecbot2.frontRight.setPower(power);
@@ -235,7 +241,7 @@ public class BasicAutonomous extends LinearOpMode {
             }
         }
 
-        while((currentTime - startTime < time) && opModeIsActive()) {
+        while ((currentTime - startTime < time) && opModeIsActive()) {
             currentTime = getRuntime();
 
             sleep(50);
@@ -250,24 +256,23 @@ public class BasicAutonomous extends LinearOpMode {
         tecbot2.backRight.setPower(0);
     }
 
-    public void pivotRobotByGyro(String turnDirection, double targetGyroHeading, double power){
+    public void pivotRobotByGyro(String turnDirection, double targetGyroHeading, double power) {
 
         double currentGyroHeading = tecbot2Gyro.getIntegratedZValue();
 
         if (turnDirection.equals("clockwise")) {
             telemetry.addData("Status: ", "turningCW");
             setDriveMotorPower(power, power, -power, -power);
-            while ((currentGyroHeading >= targetGyroHeading)&& opModeIsActive()) {
+            while ((currentGyroHeading >= targetGyroHeading) && opModeIsActive()) {
                 sleep(50);
                 currentGyroHeading = tecbot2Gyro.getIntegratedZValue();
                 telemetry.addData("Gyro Heading: ", currentGyroHeading);
                 telemetry.update();
             }
-        }
-        else if (turnDirection.equals("cClockwise")){
+        } else if (turnDirection.equals("cClockwise")) {
             telemetry.addData("Status: ", "turningCW");
             setDriveMotorPower(-power, -power, power, power);
-            while ((currentGyroHeading <= targetGyroHeading) && opModeIsActive()){
+            while ((currentGyroHeading <= targetGyroHeading) && opModeIsActive()) {
                 sleep(50);
                 currentGyroHeading = tecbot2Gyro.getIntegratedZValue();
                 telemetry.addData("Gyro Heading: ", currentGyroHeading);
@@ -280,11 +285,11 @@ public class BasicAutonomous extends LinearOpMode {
 
     }
 
-    public void driveByTime(double time, double leftFrontPower, double leftBackPower, double rightFrontPower, double rightBackPower){
+    public void driveByTime(double time, double leftFrontPower, double leftBackPower, double rightFrontPower, double rightBackPower) {
         double startTime = getRuntime();
         double currentTime = getRuntime();
 
-        while((currentTime - startTime < time) && opModeIsActive()) {
+        while ((currentTime - startTime < time) && opModeIsActive()) {
             currentTime = getRuntime();
             tecbot2.frontLeft.setPower(leftFrontPower);
             tecbot2.backLeft.setPower(leftBackPower);
@@ -300,19 +305,19 @@ public class BasicAutonomous extends LinearOpMode {
         tecbot2.backRight.setPower(allMotorPowers);
     }
 
-    public void correctPower (double frontLeftPower, double backLeftPower,
-                              double frontRightPower, double backRightPower){
+    public void correctPower(double frontLeftPower, double backLeftPower,
+                             double frontRightPower, double backRightPower) {
 
-        while(Math.round(Math.abs(tecbot2.frontLeft.getPower() * 10)) != Math.round(Math.abs(frontLeftPower * 10))){
+        while (Math.round(Math.abs(tecbot2.frontLeft.getPower() * 10)) != Math.round(Math.abs(frontLeftPower * 10))) {
             tecbot2.frontLeft.setPower(frontLeftPower);
         }
-        while(Math.round(Math.abs(tecbot2.backLeft.getPower() * 10)) != Math.round(Math.abs(backLeftPower * 10))){
+        while (Math.round(Math.abs(tecbot2.backLeft.getPower() * 10)) != Math.round(Math.abs(backLeftPower * 10))) {
             tecbot2.backLeft.setPower(backLeftPower);
         }
-        while(Math.round(Math.abs(tecbot2.frontRight.getPower() * 10)) != Math.round(Math.abs(frontRightPower * 10))){
+        while (Math.round(Math.abs(tecbot2.frontRight.getPower() * 10)) != Math.round(Math.abs(frontRightPower * 10))) {
             tecbot2.frontRight.setPower(frontRightPower);
         }
-        while(Math.round(Math.abs(tecbot2.backRight.getPower() * 10)) != Math.round(Math.abs(backRightPower * 10))){
+        while (Math.round(Math.abs(tecbot2.backRight.getPower() * 10)) != Math.round(Math.abs(backRightPower * 10))) {
             tecbot2.backRight.setPower(backRightPower);
         }
     }
@@ -323,5 +328,83 @@ public class BasicAutonomous extends LinearOpMode {
         tecbot2.backLeft.setPower(backLeftPower);
         tecbot2.frontRight.setPower(frontRightPower);
         tecbot2.backRight.setPower(backRightPower);
+    }
+
+    public void gyroDriveByTime(double power,
+                                double time,
+                                double targetHeading,
+                                double propConst) {
+
+//        int newLeftTarget;
+//        int newRightTarget;
+//        int moveCounts;
+//        double max;
+//        double error;
+//        double steer;
+        double leftPower = power;
+        double rightPower = power;
+
+        double startTime = getRuntime();
+        double currentTime = getRuntime();
+        double stopTime = startTime + time;
+
+        double error;
+        double steer;
+
+        // Ensure that the opmode is still active
+        while (opModeIsActive() && (currentTime < stopTime)) {
+
+            // start motion.
+            //power = Range.clip(Math.abs(power), 0.0, 1.0);
+            setDriveMotorPower(leftPower,leftPower,rightPower, rightPower);
+            //correctPower(power, power, power, power);
+
+            error = targetHeading - tecbot2Gyro.getIntegratedZValue();
+            steer = error * propConst;
+
+
+            if (error > 0) {
+                telemetry.addData("Gyro Heading: ", tecbot2Gyro.getIntegratedZValue());
+                telemetry.addData("error: ", error);
+                telemetry.update();
+
+                rightPower = power;
+                leftPower = power - Math.abs(steer);
+
+                if (leftPower < 0) {
+                    leftPower = 0;
+                }
+                setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
+            }
+
+            else if (error < 0) {
+                telemetry.addData("Gyro Heading: ", tecbot2Gyro.getIntegratedZValue());
+                telemetry.addData("error: ", error);
+                telemetry.update();
+
+                rightPower = power - Math.abs(steer);
+                leftPower = power;
+
+                if (rightPower < 0) {
+                    rightPower = 0;
+                }
+                setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
+            }
+
+            else {
+                telemetry.addData("Gyro Heading: ", tecbot2Gyro.getIntegratedZValue());
+                telemetry.addData("error: ", error);
+                telemetry.update();
+
+                rightPower = power;
+                leftPower = power;
+
+                setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
+            }
+
+
+            currentTime = getRuntime();
+
+        }
     }
 }
