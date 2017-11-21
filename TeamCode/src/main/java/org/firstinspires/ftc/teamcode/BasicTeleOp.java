@@ -75,6 +75,11 @@ public class BasicTeleOp extends LinearOpMode {
     boolean grabberOpen;
     boolean grabberClose;
 
+    double frontLeftPower;
+    double frontRightPower;
+    double backLeftPower;
+    double backRightPower;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -151,10 +156,18 @@ public class BasicTeleOp extends LinearOpMode {
             }
 
             // Send calculated power to wheels
-            tecbot2.frontLeft.setPower (((strafeY * STRAFE_MULTIPLIER) - (strafeX * STRAFE_MULTIPLIER) + (turn * TURN_MULTIPLIER)) * driveSpeed);
-            tecbot2.frontRight.setPower(((strafeY * STRAFE_MULTIPLIER) + (strafeX * STRAFE_MULTIPLIER) - (turn * TURN_MULTIPLIER)) * driveSpeed);
-            tecbot2.backLeft.setPower  (((strafeY * STRAFE_MULTIPLIER) + (strafeX * STRAFE_MULTIPLIER) + (turn * TURN_MULTIPLIER)) * driveSpeed);
-            tecbot2.backRight.setPower (((strafeY * STRAFE_MULTIPLIER) - (strafeX * STRAFE_MULTIPLIER) - (turn * TURN_MULTIPLIER)) * driveSpeed);
+
+            frontLeftPower =  ((strafeY * STRAFE_MULTIPLIER) - (strafeX * STRAFE_MULTIPLIER) + (turn * TURN_MULTIPLIER)) * driveSpeed;
+            frontRightPower = ((strafeY * STRAFE_MULTIPLIER) + (strafeX * STRAFE_MULTIPLIER) - (turn * TURN_MULTIPLIER)) * driveSpeed;
+            backLeftPower =   ((strafeY * STRAFE_MULTIPLIER) + (strafeX * STRAFE_MULTIPLIER) + (turn * TURN_MULTIPLIER)) * driveSpeed;
+            backRightPower =  ((strafeY * STRAFE_MULTIPLIER) - (strafeX * STRAFE_MULTIPLIER) - (turn * TURN_MULTIPLIER)) * driveSpeed;
+
+            tecbot2.frontLeft.setPower (frontLeftPower);
+            tecbot2.frontRight.setPower(frontRightPower);
+            tecbot2.backLeft.setPower  (backLeftPower);
+            tecbot2.backRight.setPower (backRightPower);
+
+            correctPower(frontLeftPower,backLeftPower,frontRightPower,backRightPower);
 
             tecbot2.lift1.setPower(lift1);
             tecbot2.lift2.setPower(lift2);
@@ -164,6 +177,23 @@ public class BasicTeleOp extends LinearOpMode {
             telemetry.addData("Motors", "frontLeft (%.2f), backLeft (%.2f)", strafeY + strafeX + turn, strafeY - strafeX + turn);
             telemetry.addData("Motors", "frontRight (%.2f), backRight (%.2f)", strafeY - strafeX - turn, strafeY + strafeX - turn);
             telemetry.update();
+        }
+    }
+
+    public void correctPower(double frontLeftPower, double backLeftPower,
+                             double frontRightPower, double backRightPower) {
+
+        while (Math.round(Math.abs(tecbot2.frontLeft.getPower() * 10)) != Math.round(Math.abs(frontLeftPower * 10))) {
+            tecbot2.frontLeft.setPower(frontLeftPower);
+        }
+        while (Math.round(Math.abs(tecbot2.backLeft.getPower() * 10)) != Math.round(Math.abs(backLeftPower * 10))) {
+            tecbot2.backLeft.setPower(backLeftPower);
+        }
+        while (Math.round(Math.abs(tecbot2.frontRight.getPower() * 10)) != Math.round(Math.abs(frontRightPower * 10))) {
+            tecbot2.frontRight.setPower(frontRightPower);
+        }
+        while (Math.round(Math.abs(tecbot2.backRight.getPower() * 10)) != Math.round(Math.abs(backRightPower * 10))) {
+            tecbot2.backRight.setPower(backRightPower);
         }
     }
 }

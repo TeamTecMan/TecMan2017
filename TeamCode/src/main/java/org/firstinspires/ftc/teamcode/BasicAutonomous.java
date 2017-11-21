@@ -65,7 +65,7 @@ public class BasicAutonomous extends LinearOpMode {
     String teamColor = "blue";
 
     double servoUpPos = 0.25; // Range of 0-1 (0.25 best position)
-    double servoDownPos = 0.95; // Range of 0-1 (1 best position)
+    double servoDownPos = 1; // Range of 0-1 (1 best position)
     double jewelServoPos;
     ModernRoboticsI2cGyro tecbot2Gyro = null; // Additional Gyro device
 
@@ -101,8 +101,8 @@ public class BasicAutonomous extends LinearOpMode {
         // initialize gyro
         telemetry.addData("Status: ", "preparing to calibrate gyro");
         telemetry.update();
-
         tecbot2Gyro.calibrate();
+
         while (tecbot2Gyro.isCalibrating()) {
             sleep(50);
             telemetry.addData("Status: ", "Calibrating Gyro");
@@ -120,6 +120,7 @@ public class BasicAutonomous extends LinearOpMode {
             if (gamepad1.b) {
                 teamColor = "red";
             }
+            sleep(50);
             jewelServoPos = tecbot2.jewelServo.getPosition();
             telemetry.addData("Jewel Servo Pos: ", jewelServoPos);
             telemetry.addData("Team Color: ", teamColor);
@@ -131,7 +132,7 @@ public class BasicAutonomous extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        gyroDriveByTime(0.25, 120, 0, 0.025);
+        //gyroDriveByTime(0.25, 120, 0, 0.025);
 
         //todo grab glyph
         //todo lift glyph
@@ -139,6 +140,8 @@ public class BasicAutonomous extends LinearOpMode {
         knockJewels();
 
         sleep(5000);
+
+
 
         //Split code into 2 teams
         if (teamColor.equals("blue")) {
@@ -188,8 +191,10 @@ public class BasicAutonomous extends LinearOpMode {
 
             sleep(5000);
 
-            while ((tecbot2.jewelSensor.red() > tecbot2.jewelSensor.blue()) == false &&
-                    (tecbot2.jewelSensor.blue() > tecbot2.jewelSensor.red()) == false) {
+            while (tecbot2.jewelSensor.red() == tecbot2.jewelSensor.blue()){
+                telemetry.addData("Blue: ", tecbot2.jewelSensor.blue());
+                telemetry.addData("Red: ", tecbot2.jewelSensor.red());
+                telemetry.update();
                 pivotRobotByTime("clockwise", 0.005, 0.1);
             }
 
@@ -199,19 +204,26 @@ public class BasicAutonomous extends LinearOpMode {
                 if (teamColor.equals("blue")) {
                     pivotRobotByTime("clockwise", pivotTime, pivotPower);
                     telemetry.addData("Sensor Color: ", "blue");
+                    telemetry.update();
                 }
                 if (teamColor.equals("red")) {
                     pivotRobotByTime("cClockwise", pivotTime, pivotPower);
                     telemetry.addData("Sensor Color: ", "blue");
+                    telemetry.update();
+
                 }
             } else if (tecbot2.jewelSensor.blue() > tecbot2.jewelSensor.red()) {
                 if (teamColor.equals("blue")) {
                     pivotRobotByTime("cClockwise", pivotTime, pivotPower);
                     telemetry.addData("Sensor Color: ", "red");
+                    telemetry.update();
+
                 }
                 if (teamColor.equals("red")) {
                     pivotRobotByTime("clockwise", pivotTime, pivotPower);
                     telemetry.addData("Sensor Color: ", "red");
+                    telemetry.update();
+
                 }
             }
         }
@@ -335,12 +347,6 @@ public class BasicAutonomous extends LinearOpMode {
                                 double targetHeading,
                                 double propConst) {
 
-//        int newLeftTarget;
-//        int newRightTarget;
-//        int moveCounts;
-//        double max;
-//        double error;
-//        double steer;
         double leftPower = power;
         double rightPower = power;
 
@@ -406,5 +412,7 @@ public class BasicAutonomous extends LinearOpMode {
             currentTime = getRuntime();
 
         }
+
+        setDriveMotorPower(0, 0, 0, 0);
     }
 }
