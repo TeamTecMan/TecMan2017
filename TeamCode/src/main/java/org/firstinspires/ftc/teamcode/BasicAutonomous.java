@@ -134,8 +134,7 @@ public class BasicAutonomous extends LinearOpMode {
 
         //gyroDriveByTime(0.25, 120, 0, 0.025);
 
-        //todo grab glyph
-        //todo lift glyph
+        glyph("lift");
 
         knockJewels();
 
@@ -147,20 +146,20 @@ public class BasicAutonomous extends LinearOpMode {
         if (teamColor.equals("blue")) {
             // turn to cryptobox
             pivotRobotByGyro("cClockwise", 85, 0.1);
-            //todo drive off platform
-            //todo drop glyph
-            //todo push glyph into cryptobox
-            //todo back away from glyph
+            gyroDriveByTime(0.25, 2000, 90, 0.1);
+            glyph("drop");
+            gyroDriveByTime(-0.01, 1000, -90, 0.1);
+            gyroDriveByTime(-0.01, 25, 90, 0.1);
         }
 
         if (teamColor.equals("red")) {
             // turn to cryptobox
             pivotRobotByGyro("clockwise", -85, 0.1);
 
-            //todo drive off platform
-            //todo drop glyph
-            //todo push glyph into cryptobox
-            //todo back away from glyph
+            glyph("drop");
+            gyroDriveByTime(0.25, 2000, -90, 0.1);
+            gyroDriveByTime(-0.01, 1000, -90, 0.1);
+            gyroDriveByTime(-0.01, 25, -90, 0.1);
         }
 
         // run until the end of the match (driver presses STOP)
@@ -414,5 +413,34 @@ public class BasicAutonomous extends LinearOpMode {
         }
 
         setDriveMotorPower(0, 0, 0, 0);
+    }
+    public void glyph (String objective){
+        double glyphPower = 0.01;
+        if (objective.equals("lift")){
+
+            //grab glyph
+            tecbot2.grabber.setPower(-0.25);
+            sleep(50);
+            tecbot2.grabber.setPower(glyphPower);
+
+            //lift glyph
+            tecbot2.lift1.setPower(0.1);
+            sleep(25);
+            tecbot2.lift1.setPower(0);
+
+        }
+        if (objective.equals("drop")){
+
+            //lower glyph
+            tecbot2.lift1.setPower(-0.1);
+            sleep(25);
+            tecbot2.lift1.setPower(0);
+
+            //release glyph
+            tecbot2.grabber.setPower(0.25);
+            sleep(50);
+            tecbot2.grabber.setPower(0);
+
+        }
     }
 }
