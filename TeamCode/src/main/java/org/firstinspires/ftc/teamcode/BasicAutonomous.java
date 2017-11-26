@@ -115,10 +115,16 @@ public class BasicAutonomous extends LinearOpMode {
         while (!isStarted()) {
             //Setting team color
             if (gamepad1.x) {
-                teamColor = "blue";
+                teamColor = "blue1";
             }
             if (gamepad1.b) {
-                teamColor = "red";
+                teamColor = "red1";
+            }
+            if (gamepad2.x){
+                teamColor = "blue2";
+            }
+            if (gamepad1.b){
+                teamColor = "red2";
             }
             sleep(50);
             jewelServoPos = tecbot2.jewelServo.getPosition();
@@ -138,28 +144,65 @@ public class BasicAutonomous extends LinearOpMode {
 
         knockJewels();
 
-        sleep(5000);
+        sleep(50);
 
 
 
         //Split code into 2 teams
-        if (teamColor.equals("blue")) {
+        if (teamColor.equals("blue1")) {
             // turn to cryptobox
             pivotRobotByGyro("cClockwise", 85, 0.1);
+            //leave platform
             gyroDriveByTime(0.25, 2000, 90, 0.1);
+            //drop glyph
             glyph("drop");
+            //put glyph in cryptobox
             gyroDriveByTime(-0.01, 1000, -90, 0.1);
+            //back up
             gyroDriveByTime(-0.01, 25, 90, 0.1);
         }
 
-        if (teamColor.equals("red")) {
+        if (teamColor.equals("red1")) {
             // turn to cryptobox
             pivotRobotByGyro("clockwise", -85, 0.1);
-
-            glyph("drop");
+            //leave platform
             gyroDriveByTime(0.25, 2000, -90, 0.1);
+            //drop glyph
+            glyph("drop");
+            //put glyph in cryptobox
             gyroDriveByTime(-0.01, 1000, -90, 0.1);
+            //back up
             gyroDriveByTime(-0.01, 25, -90, 0.1);
+        }
+
+        if (teamColor.equals("blue2")){
+            //turn to point off platform
+            pivotRobotByGyro("cClockwise", 85, 0.1);
+            //drive off platform
+            gyroDriveByTime(0.25, 500, -90, 0.1);
+            //turn to cryptobox
+            pivotRobotByGyro("cClockwise", -90, 0.1);
+            //drop glyph
+            glyph("drop");
+            //put glyph in cryptobox
+            gyroDriveByTime(-0.01, 1000, 180, 0.1);
+            //back up
+            gyroDriveByTime(-0.01, 25, 180, 0.1);
+        }
+
+        if (teamColor.equals("red2")){
+            //turn to point off platform
+            pivotRobotByGyro("Clockwise", -85, 0.1);
+            //drive off platform
+            gyroDriveByTime(0.25, 500, -90, 0.1);
+            //turn to cryptobox
+            pivotRobotByGyro("clockwise", 90, 0.1);
+            //drop glyph
+            glyph("drop");
+            //put glyph in cryptobox
+            gyroDriveByTime(-0.01, 1000, -180, 0.1);
+            //back up
+            gyroDriveByTime(-0.01, 25, -180, 0.1);
         }
 
         // run until the end of the match (driver presses STOP)
@@ -188,7 +231,7 @@ public class BasicAutonomous extends LinearOpMode {
         if (opModeIsActive()) {
             tecbot2.jewelServo.setPosition(servoDownPos);
 
-            sleep(5000);
+            sleep(50);
 
             while (tecbot2.jewelSensor.red() == tecbot2.jewelSensor.blue()){
                 telemetry.addData("Blue: ", tecbot2.jewelSensor.blue());
@@ -197,7 +240,7 @@ public class BasicAutonomous extends LinearOpMode {
                 pivotRobotByTime("clockwise", 0.005, 0.1);
             }
 
-            sleep(5000);
+            sleep(50);
 
             if (tecbot2.jewelSensor.red() > tecbot2.jewelSensor.blue()) {
                 if (teamColor.equals("blue")) {
@@ -227,7 +270,7 @@ public class BasicAutonomous extends LinearOpMode {
             }
         }
 
-        sleep(5000);
+        sleep(50);
 
         if (opModeIsActive()) {
             tecbot2.jewelServo.setPosition(servoUpPos);
