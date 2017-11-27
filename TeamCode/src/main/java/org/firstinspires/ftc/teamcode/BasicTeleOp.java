@@ -114,11 +114,28 @@ public class BasicTeleOp extends LinearOpMode {
         tecbot2.lift2.setDirection(DcMotor.Direction.FORWARD);
         tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
 
+        tecbot2Gyro.calibrate();
+
+        while (tecbot2Gyro.isCalibrating() && !isStarted()) {
+            sleep(50);
+            telemetry.addData("Status: ", "Calibrating Gyro");
+            telemetry.update();
+        }
+
+        if (!tecbot2Gyro.isCalibrating()){
+            telemetry.addData("Status: ", "Done calibrating");
+            telemetry.update();
+        }
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        tecbot2Gyro.calibrate();
+        if (!tecbot2Gyro.isCalibrating()){
+            telemetry.addData("Status: ", "Done calibrating");
+            telemetry.update();
+        }
+
         tecbot2.frontLeft.setPower(0);
         tecbot2.backLeft.setPower(0);
         tecbot2.frontRight.setPower(0);
@@ -162,8 +179,8 @@ public class BasicTeleOp extends LinearOpMode {
                 tecbot2.grabber.setPower(0);
             }
 
-            if (gamepad1.a){
-                followGyroHeading();
+            if (gamepad1.dpad_up){
+                followGyroHeading(0.7, 0.1);
             }
 
             // Send calculated power to wheels
@@ -208,9 +225,7 @@ public class BasicTeleOp extends LinearOpMode {
         }
     }
 
-    public void gyroDriveByTime(double power,
-                                double time,
-                                double targetHeading,
+    public void followGyroHeading(double power,
                                 double propConst) {
 
         double leftPower = power;
@@ -223,8 +238,10 @@ public class BasicTeleOp extends LinearOpMode {
         double error;
         double steer;
 
+        double targetHeading = tecbot2Gyro.getIntegratedZValue();
+
         // Ensure that the opmode is still active
-        while (opModeIsActive() && (currentTime < stopTime)) {
+        while (opModeIsActive() && gamepad1.dpad_up) {
 
             // start motion.
             //power = Range.clip(Math.abs(power), 0.0, 1.0);
@@ -298,12 +315,12 @@ public class BasicTeleOp extends LinearOpMode {
     }
 
 
-    public void followGyroHeading(){
+    /*public void followGyroHeading(){
         double currentGyroHeading = tecbot2Gyro.getIntegratedZValue();
 
-        while(!gamepad1.a){
-            gyroDriveByTime(0.5, 500, currentGyroHeading, 0.1);
+        while(!gamepad1.dpad_up){
+            gyroDriveByTime(0.5, 0.1, currentGyroHeading, 0.1);
         }
 
-    }
+    }*/
 }
