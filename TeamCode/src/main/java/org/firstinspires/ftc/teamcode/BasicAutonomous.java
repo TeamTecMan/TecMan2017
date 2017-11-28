@@ -62,7 +62,7 @@ public class BasicAutonomous extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime(); //Time is in seconds
     //Methods methods = new Methods();
 
-    String teamColor = "blue";
+    String teamColor = "blueOpposite";
 
     double servoUpPos = 0.25; // Range of 0-1 (0.25 best position)
     double servoDownPos = 1; // Range of 0-1 (1 best position)
@@ -150,19 +150,29 @@ public class BasicAutonomous extends LinearOpMode {
 
         //Split code into 2 teams
         if (teamColor.equals("blueOpposite")) {
+            gyroDriveByTime(0.1, 0.75, 0, 0.3);
             // turn to cryptobox
-            pivotRobotByGyro("cClockwise", 70, 0.1);
+             pivotRobotByGyro("cClockwise", 70, 0.1);
             //leave platform
-            gyroDriveByTime(0.25, 2000, 75, 0.1);
+            gyroDriveByTime(0.25, 4, 75, 0.1);
             //drop glyph
             glyph("drop");
-            //put glyph in cryptobox
-            gyroDriveByTime(0.25, 1000, 75, 0.1);
             //back up
-            gyroDriveByTime(-0.01, 25, 75, 0.1);
+            setAllDriveMotorPower(-0.2);
+            sleep(500);
+            setAllDriveMotorPower(0);
+            correctPower(0,0,0,0);
+            //put glyph in cryptobox
+            gyroDriveByTime(0.25, 1, 75, 0.1);
+            //back up
+            setAllDriveMotorPower(-0.2);
+            sleep(500);
+            setAllDriveMotorPower(0);
+            correctPower(0,0,0,0);
         }
 
         if (teamColor.equals("redOpposite")) {
+            gyroDriveByTime(0.1, 0.75, 0, 0.3);
             // turn to cryptobox
             pivotRobotByGyro("clockwise", -70, 0.1);
             //leave platform
@@ -176,18 +186,29 @@ public class BasicAutonomous extends LinearOpMode {
         }
 
         if (teamColor.equals("blueRecovery")){
+            gyroDriveByTime(0.1, 0.75, 0, 0.3);
             //turn to point off platform
-            pivotRobotByGyro("cClockwise", 85, 0.1);
+            pivotRobotByGyro("cClockwise", 75, 0.1);
             //drive off platform
-            gyroDriveByTime(0.25, 500, 90, 0.1);
+            gyroDriveByTime(0.25, 3.5, 75, 0.1);
             //turn to cryptobox
-            pivotRobotByGyro("cClockwise", 175, 0.1);
+            pivotRobotByGyro("cClockwise", 155, 0.1);
+            //put glyph in cryptobox
+            gyroDriveByTime(0.25, 4, 160, 0.1);
             //drop glyph
             glyph("drop");
-            //put glyph in cryptobox
-            gyroDriveByTime(0.25, 1000, 180, 0.1);
             //back up
-            gyroDriveByTime(-0.01, 25, 180, 0.1);
+            setAllDriveMotorPower(-0.2);
+            sleep(400);
+            setAllDriveMotorPower(0);
+            correctPower(0,0,0,0);
+            //put glyph in cryptobox
+            gyroDriveByTime(0.25, 1, 160, 0.1);
+            //back up
+            setAllDriveMotorPower(-0.2);
+            sleep(500);
+            setAllDriveMotorPower(0);
+            correctPower(0,0,0,0);
         }
 
         if (teamColor.equals("redRecovery")){
@@ -231,7 +252,7 @@ public class BasicAutonomous extends LinearOpMode {
         if (opModeIsActive()) {
             tecbot2.jewelServo.setPosition(servoDownPos);
 
-            sleep(50);
+            sleep(2000);
 
             while (tecbot2.jewelSensor.red() == tecbot2.jewelSensor.blue()){
                 telemetry.addData("Blue: ", tecbot2.jewelSensor.blue());
@@ -240,7 +261,7 @@ public class BasicAutonomous extends LinearOpMode {
                 pivotRobotByTime("clockwise", 0.005, 0.1);
             }
 
-            sleep(50);
+            sleep(2000);
 
             if (tecbot2.jewelSensor.red() > tecbot2.jewelSensor.blue()) {
                 if (teamColor.equals("blueRecovery") || teamColor.equals("blueOpposite") ) {
@@ -266,7 +287,7 @@ public class BasicAutonomous extends LinearOpMode {
                     telemetry.addData("Sensor Color: ", "red");
                     telemetry.update();
 
-                }
+                 }
             }
         }
 
@@ -385,7 +406,7 @@ public class BasicAutonomous extends LinearOpMode {
     }
 
     public void gyroDriveByTime(double power,
-                                double time,
+                                double time, //seconds
                                 double targetHeading,
                                 double propConst) {
 
@@ -458,31 +479,31 @@ public class BasicAutonomous extends LinearOpMode {
         setDriveMotorPower(0, 0, 0, 0);
     }
     public void glyph (String objective){
-        double glyphPower = 0.01;
+        double glyphPower = -0.1;
         if (objective.equals("lift")){
 
             //grab glyph
             tecbot2.grabber.setPower(-0.25);
-            sleep(50);
+            sleep(1000);
             tecbot2.grabber.setPower(glyphPower);
 
             //lift glyph
-            tecbot2.lift1.setPower(-0.1);
-            sleep(25);
-            tecbot2.lift1.setPower(0);
+            tecbot2.lift2.setPower(0.4);
+            sleep(2000);
+            tecbot2.lift2.setPower(0);
 
         }
         if (objective.equals("drop")){
 
-            //lower glyph
-            tecbot2.lift1.setPower(0.1);
-            sleep(25);
-            tecbot2.lift1.setPower(0);
-
             //release glyph
             tecbot2.grabber.setPower(0.25);
-            sleep(50);
+            sleep(1000);
             tecbot2.grabber.setPower(0);
+
+//            //lower glyph
+//            tecbot2.lift2.setPower(-0.1);
+//            sleep(25);
+//            tecbot2.lift2.setPower(0);
 
         }
     }
