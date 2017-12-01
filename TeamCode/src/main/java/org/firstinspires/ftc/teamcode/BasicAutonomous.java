@@ -152,7 +152,7 @@ public class BasicAutonomous extends LinearOpMode {
         if (teamColor.equals("blueOpposite")) {
             gyroDriveByTime(0.1, 0.75, 0, 0.3);
             // turn to cryptobox
-             pivotRobotByGyro("cClockwise", 70, 0.1);
+            pivotRobotByGyro("cClockwise", 70, 0.1);
             //leave platform
             gyroDriveByTime(0.25, 4, 75, 0.1);
             //drop glyph
@@ -176,13 +176,21 @@ public class BasicAutonomous extends LinearOpMode {
             // turn to cryptobox
             pivotRobotByGyro("clockwise", -70, 0.1);
             //leave platform
-            gyroDriveByTime(0.25, 2000, -75, 0.1);
+            gyroDriveByTime(0.25, 4, -75, 0.1);
             //drop glyph
             glyph("drop");
-            //put glyph in cryptobox
-            gyroDriveByTime(0.25, 1000, -75, 0.1);
             //back up
-            gyroDriveByTime(-0.01, 25, -75, 0.1);
+            setAllDriveMotorPower(-0.2);
+            sleep(500);
+            setAllDriveMotorPower(0);
+            correctPower(0,0,0,0);
+            //put glyph in cryptobox
+            gyroDriveByTime(0.25, 1, -75, 0.1);
+            //back up
+            setAllDriveMotorPower(-0.2);
+            sleep(500);
+            setAllDriveMotorPower(0);
+            correctPower(0,0,0,0);
         }
 
         if (teamColor.equals("blueRecovery")){
@@ -212,18 +220,29 @@ public class BasicAutonomous extends LinearOpMode {
         }
 
         if (teamColor.equals("redRecovery")){
+            gyroDriveByTime(0.1, 0.75, 0, 0.3);
             //turn to point off platform
-            pivotRobotByGyro("Clockwise", -85, 0.1);
+            pivotRobotByGyro("clockwise", -75, 0.1);
             //drive off platform
-            gyroDriveByTime(0.25, 500, -90, 0.1);
+            gyroDriveByTime(0.25, 3.5, -75, 0.1);
             //turn to cryptobox
-            pivotRobotByGyro("clockwise", -175, 0.1);
+            pivotRobotByGyro("clockwise", -155, 0.1);
+            //put glyph in cryptobox
+            gyroDriveByTime(0.25, 4, -160, 0.1);
             //drop glyph
             glyph("drop");
-            //put glyph in cryptobox
-            gyroDriveByTime(0.25, 1000, -180, 0.1);
             //back up
-            gyroDriveByTime(-0.01, 25, -180, 0.1);
+            setAllDriveMotorPower(-0.2);
+            sleep(400);
+            setAllDriveMotorPower(0);
+            correctPower(0,0,0,0);
+            //put glyph in cryptobox
+            gyroDriveByTime(0.25, 1, -160, 0.1);
+            //back up
+            setAllDriveMotorPower(-0.2);
+            sleep(500);
+            setAllDriveMotorPower(0);
+            correctPower(0,0,0,0);
         }
 
         // run until the end of the match (driver presses STOP)
