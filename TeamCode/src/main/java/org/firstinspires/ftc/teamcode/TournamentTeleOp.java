@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -60,8 +61,8 @@ public class TournamentTeleOp extends LinearOpMode {
     Methods methods = new Methods();
 
     static final double STRAFE_MULTIPLIER = 1.5;
-    static final double TURN_MULTIPLIER   = 0.75;
-    double servoUpPos   = 0; // Range of 0-1
+    static final double TURN_MULTIPLIER = 0.75;
+    double servoUpPos = 0; // Range of 0-1
 
     double strafeX;
     double strafeY;
@@ -75,6 +76,11 @@ public class TournamentTeleOp extends LinearOpMode {
     boolean grabberOpen;
     boolean grabberClose;
 
+    double frontLeftPower;
+    double frontRightPower;
+    double backLeftPower;
+    double backRightPower;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -83,15 +89,15 @@ public class TournamentTeleOp extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned durin g the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        tecbot2.frontLeft  = hardwareMap.get(DcMotor.class, "front_left");
-        tecbot2.backLeft   = hardwareMap.get(DcMotor.class, "back_left");
+        tecbot2.frontLeft = hardwareMap.get(DcMotor.class, "front_left");
+        tecbot2.backLeft = hardwareMap.get(DcMotor.class, "back_left");
         tecbot2.frontRight = hardwareMap.get(DcMotor.class, "front_right");
-        tecbot2.backRight  = hardwareMap.get(DcMotor.class, "back_right");
-        tecbot2.lift1      = hardwareMap.get(DcMotor.class, "lift_1");
-        tecbot2.lift2      = hardwareMap.get(DcMotor.class, "lift_2");
-        tecbot2.grabber    = hardwareMap.get(DcMotor.class, "grabber");
-        tecbot2.jewelServo = hardwareMap.get(Servo.class,   "jewel_servo");
-
+        tecbot2.backRight = hardwareMap.get(DcMotor.class, "back_right");
+        tecbot2.lift1 = hardwareMap.get(DcMotor.class, "lift_1");
+        tecbot2.lift2 = hardwareMap.get(DcMotor.class, "lift_2");
+        tecbot2.grabber = hardwareMap.get(DcMotor.class, "grabber");
+        tecbot2.jewelServo = hardwareMap.get(Servo.class, "jewel_servo");
+        tecbot2.gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motors that runs backwards when connected directly to the battery
@@ -104,6 +110,27 @@ public class TournamentTeleOp extends LinearOpMode {
         tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
 //       tecbot2.jewelServo.setPosition(); // might be redundant, used in autonomous
 
+        tecbot2.gyro.calibrate();
+
+        while (tecbot2.gyro.isCalibrating() && !isStarted()) {
+            sleep(50);
+            telemetry.addData("Status: ", "Calibrating Gyro");
+            telemetry.update();
+        }
+
+        if (!tecbot2.gyro.isCalibrating()){
+            telemetry.addData("Status: ", "Done calibrating");
+            telemetry.update();
+        }
+
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+        runtime.reset();
+
+        if (!tecbot2.gyro.isCalibrating()){
+            telemetry.addData("Status: ", "Done calibrating");
+            telemetry.update();
+        }
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -123,18 +150,18 @@ public class TournamentTeleOp extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            lift1 = -gamepad2.left_stick_y/2;
-            lift2 = -gamepad2.right_stick_y/2;
+            lift1 = -gamepad2.left_stick_y / 2;
+            lift2 = -gamepad2.right_stick_y / 2;
             grabberOpen = gamepad2.right_bumper;
             grabberClose = gamepad2.left_bumper;
 
             driveFast = gamepad1.right_bumper;
             driveSlow = gamepad1.left_bumper;
 
-            if     (driveFast && !driveSlow){
+            if (driveFast && !driveSlow) {
                 driveSpeed = 0.7;
             }
-            else if(!driveFast && driveSlow){
+            else if (!driveFast && driveSlow) {
                 driveSpeed = 0.3;
             }
 
@@ -142,21 +169,30 @@ public class TournamentTeleOp extends LinearOpMode {
             strafeY = gamepad1.left_stick_y; // Forward and backward
             turn = -gamepad1.right_stick_x;
 
-            if     (grabberOpen && !grabberClose){
+            if (grabberOpen && !grabberClose) {
                 tecbot2.grabber.setPower(0.25);
-            }
-            else if(!grabberOpen && grabberClose){
+            } else if (!grabberOpen && grabberClose) {
                 tecbot2.grabber.setPower(-0.25);
-            }
-            else{
+            } else {
                 tecbot2.grabber.setPower(0);
             }
 
+            if (gamepad1.dpad_up) {
+                followGyroHeading(0.7, 0.1);
+            }
+
             // Send calculated power to wheels
-            tecbot2.frontLeft.setPower (((strafeY * STRAFE_MULTIPLIER) - (strafeX * STRAFE_MULTIPLIER) + (turn * TURN_MULTIPLIER)) * driveSpeed);
-            tecbot2.frontRight.setPower(((strafeY * STRAFE_MULTIPLIER) + (strafeX * STRAFE_MULTIPLIER) - (turn * TURN_MULTIPLIER)) * driveSpeed);
-            tecbot2.backLeft.setPower  (((strafeY * STRAFE_MULTIPLIER) + (strafeX * STRAFE_MULTIPLIER) + (turn * TURN_MULTIPLIER)) * driveSpeed);
-            tecbot2.backRight.setPower (((strafeY * STRAFE_MULTIPLIER) - (strafeX * STRAFE_MULTIPLIER) - (turn * TURN_MULTIPLIER)) * driveSpeed);
+            frontLeftPower =  ((strafeY * STRAFE_MULTIPLIER) - (strafeX * STRAFE_MULTIPLIER) + (turn * TURN_MULTIPLIER)) * driveSpeed;
+            frontRightPower = ((strafeY * STRAFE_MULTIPLIER) + (strafeX * STRAFE_MULTIPLIER) - (turn * TURN_MULTIPLIER)) * driveSpeed;
+            backLeftPower =   ((strafeY * STRAFE_MULTIPLIER) + (strafeX * STRAFE_MULTIPLIER) + (turn * TURN_MULTIPLIER)) * driveSpeed;
+            backRightPower =  ((strafeY * STRAFE_MULTIPLIER) - (strafeX * STRAFE_MULTIPLIER) - (turn * TURN_MULTIPLIER)) * driveSpeed;
+
+            tecbot2.frontLeft.setPower(frontLeftPower);
+            tecbot2.frontRight.setPower(frontRightPower);
+            tecbot2.backLeft.setPower(backLeftPower);
+            tecbot2.backRight.setPower(backRightPower);
+
+            correctPower(frontLeftPower, backLeftPower, frontRightPower, backRightPower);
 
             tecbot2.lift1.setPower(lift1);
             tecbot2.lift2.setPower(lift2);
@@ -167,5 +203,100 @@ public class TournamentTeleOp extends LinearOpMode {
             telemetry.addData("Motors", "frontRight (%.2f), backRight (%.2f)", strafeY - strafeX - turn, strafeY + strafeX - turn);
             telemetry.update();
         }
+    }
+
+    public void correctPower(double frontLeftPower, double backLeftPower,
+                             double frontRightPower, double backRightPower) {
+
+        while (Math.round(Math.abs(tecbot2.frontLeft.getPower() * 10)) != Math.round(Math.abs(frontLeftPower * 10))) {
+            tecbot2.frontLeft.setPower(frontLeftPower);
+        }
+        while (Math.round(Math.abs(tecbot2.backLeft.getPower() * 10)) != Math.round(Math.abs(backLeftPower * 10))) {
+            tecbot2.backLeft.setPower(backLeftPower);
+        }
+        while (Math.round(Math.abs(tecbot2.frontRight.getPower() * 10)) != Math.round(Math.abs(frontRightPower * 10))) {
+            tecbot2.frontRight.setPower(frontRightPower);
+        }
+        while (Math.round(Math.abs(tecbot2.backRight.getPower() * 10)) != Math.round(Math.abs(backRightPower * 10))) {
+            tecbot2.backRight.setPower(backRightPower);
+        }
+    }
+
+    public void setDriveMotorPower(double frontLeftPower, double backLeftPower,
+                                   double frontRightPower, double backRightPower) {
+        tecbot2.frontLeft.setPower(frontLeftPower);
+        tecbot2.backLeft.setPower(backLeftPower);
+        tecbot2.frontRight.setPower(frontRightPower);
+        tecbot2.backRight.setPower(backRightPower);
+    }
+
+    public void followGyroHeading(double power,
+                                  double propConst) {
+
+        double leftPower = power;
+        double rightPower = power;
+
+        double startTime = getRuntime();
+        double currentTime = getRuntime();
+        double stopTime = startTime + time;
+
+        double error;
+        double steer;
+
+        double targetHeading = tecbot2.gyro.getIntegratedZValue();
+
+        // Ensure that the opmode is still active
+        while (opModeIsActive() && gamepad1.dpad_up) {
+
+            // start motion.
+            //power = Range.clip(Math.abs(power), 0.0, 1.0);
+            setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
+            //correctPower(power, power, power, power);
+
+            error = targetHeading - tecbot2.gyro.getIntegratedZValue();
+            steer = error * propConst;
+
+
+            if (error > 0) {
+                telemetry.addData("Gyro Heading: ", tecbot2.gyro.getIntegratedZValue());
+                telemetry.addData("error: ", error);
+                telemetry.update();
+
+                rightPower = power;
+                leftPower = power - Math.abs(steer);
+
+                if (leftPower < 0) {
+                    leftPower = 0;
+                }
+                setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
+            } else if (error < 0) {
+                telemetry.addData("Gyro Heading: ", tecbot2.gyro.getIntegratedZValue());
+                telemetry.addData("error: ", error);
+                telemetry.update();
+
+                rightPower = power - Math.abs(steer);
+                leftPower = power;
+
+                if (rightPower < 0) {
+                    rightPower = 0;
+                }
+                setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
+            } else {
+                telemetry.addData("Gyro Heading: ", tecbot2.gyro.getIntegratedZValue());
+                telemetry.addData("error: ", error);
+                telemetry.update();
+
+                rightPower = power;
+                leftPower = power;
+
+                setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
+            }
+
+
+            currentTime = getRuntime();
+
+        }
+
+        setDriveMotorPower(0, 0, 0, 0);
     }
 }
