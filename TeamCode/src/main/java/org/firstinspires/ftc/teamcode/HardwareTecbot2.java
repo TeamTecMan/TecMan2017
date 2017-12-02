@@ -30,7 +30,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+//import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+// removed because MR gyro cannot be imported this way
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -69,7 +70,8 @@ public class HardwareTecbot2 extends LinearOpMode {
     public DcMotor grabber = null;
     public Servo   jewelServo;
     public ModernRoboticsI2cColorSensor jewelSensor;
-    ModernRoboticsI2cGyro gyro = null; // Additional Gyro device
+    // removed because MR gyro cannot be imported this way
+    //    ModernRoboticsI2cGyro gyro = null; // Additional Gyro device
 
     @Override
     public void runOpMode() {

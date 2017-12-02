@@ -58,6 +58,8 @@ public class TournamentTeleOp extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     HardwareTecbot2 tecbot2 = new HardwareTecbot2();
+    ModernRoboticsI2cGyro tecbot2Gyro = null; // Additional Gyro device
+
     Methods methods = new Methods();
 
     static final double STRAFE_MULTIPLIER = 1.5;
@@ -97,7 +99,10 @@ public class TournamentTeleOp extends LinearOpMode {
         tecbot2.lift2 = hardwareMap.get(DcMotor.class, "lift_2");
         tecbot2.grabber = hardwareMap.get(DcMotor.class, "grabber");
         tecbot2.jewelServo = hardwareMap.get(Servo.class, "jewel_servo");
-        tecbot2.gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
+        tecbot2Gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
+        // tecbot2Gyro requires a different form of defining
+        // because ModernRobotics gyro has more options when defined this way
+
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motors that runs backwards when connected directly to the battery
@@ -110,15 +115,15 @@ public class TournamentTeleOp extends LinearOpMode {
         tecbot2.grabber.setDirection(DcMotor.Direction.REVERSE);
 //       tecbot2.jewelServo.setPosition(); // might be redundant, used in autonomous
 
-        tecbot2.gyro.calibrate();
+        tecbot2Gyro.calibrate();
 
-        while (tecbot2.gyro.isCalibrating() && !isStarted()) {
+        while (tecbot2Gyro.isCalibrating() && !isStarted()) {
             sleep(50);
             telemetry.addData("Status: ", "Calibrating Gyro");
             telemetry.update();
         }
 
-        if (!tecbot2.gyro.isCalibrating()){
+        if (!tecbot2Gyro.isCalibrating()){
             telemetry.addData("Status: ", "Done calibrating");
             telemetry.update();
         }
@@ -127,15 +132,17 @@ public class TournamentTeleOp extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        if (!tecbot2.gyro.isCalibrating()){
+        while (tecbot2Gyro.isCalibrating()){
+            sleep(50);
+            telemetry.addData("Status: ", "Calibrating Gyro");
+            telemetry.update();
+        }
+
+        if (!tecbot2Gyro.isCalibrating()){
             telemetry.addData("Status: ", "Done calibrating");
             telemetry.update();
         }
 
-
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-        runtime.reset();
 
         tecbot2.frontLeft.setPower(0);
         tecbot2.backLeft.setPower(0);
@@ -243,7 +250,7 @@ public class TournamentTeleOp extends LinearOpMode {
         double error;
         double steer;
 
-        double targetHeading = tecbot2.gyro.getIntegratedZValue();
+        double targetHeading = tecbot2Gyro.getIntegratedZValue();
 
         // Ensure that the opmode is still active
         while (opModeIsActive() && gamepad1.dpad_up) {
@@ -253,12 +260,12 @@ public class TournamentTeleOp extends LinearOpMode {
             setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
             //correctPower(power, power, power, power);
 
-            error = targetHeading - tecbot2.gyro.getIntegratedZValue();
+            error = targetHeading - tecbot2Gyro.getIntegratedZValue();
             steer = error * propConst;
 
 
             if (error > 0) {
-                telemetry.addData("Gyro Heading: ", tecbot2.gyro.getIntegratedZValue());
+                telemetry.addData("Gyro Heading: ", tecbot2Gyro.getIntegratedZValue());
                 telemetry.addData("error: ", error);
                 telemetry.update();
 
@@ -270,7 +277,7 @@ public class TournamentTeleOp extends LinearOpMode {
                 }
                 setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
             } else if (error < 0) {
-                telemetry.addData("Gyro Heading: ", tecbot2.gyro.getIntegratedZValue());
+                telemetry.addData("Gyro Heading: ", tecbot2Gyro.getIntegratedZValue());
                 telemetry.addData("error: ", error);
                 telemetry.update();
 
@@ -282,7 +289,7 @@ public class TournamentTeleOp extends LinearOpMode {
                 }
                 setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
             } else {
-                telemetry.addData("Gyro Heading: ", tecbot2.gyro.getIntegratedZValue());
+                telemetry.addData("Gyro Heading: ", tecbot2Gyro.getIntegratedZValue());
                 telemetry.addData("error: ", error);
                 telemetry.update();
 
