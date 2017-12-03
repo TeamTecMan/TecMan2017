@@ -185,7 +185,7 @@ public class TournamentTeleOp extends LinearOpMode {
             }
 
             if (gamepad1.dpad_up) {
-                followGyroHeading(0.7, 0.1);
+                followGyroHeading(0.5 , 0.1);
             }
 
             // Send calculated power to wheels
@@ -198,8 +198,6 @@ public class TournamentTeleOp extends LinearOpMode {
             tecbot2.frontRight.setPower(frontRightPower);
             tecbot2.backLeft.setPower(backLeftPower);
             tecbot2.backRight.setPower(backRightPower);
-
-            correctPower(frontLeftPower, backLeftPower, frontRightPower, backRightPower);
 
             tecbot2.lift1.setPower(lift1);
             tecbot2.lift2.setPower(lift2);
@@ -240,8 +238,8 @@ public class TournamentTeleOp extends LinearOpMode {
     public void followGyroHeading(double power,
                                   double propConst) {
 
-        double leftPower = power;
-        double rightPower = power;
+        double leftPower = -power;
+        double rightPower = -power;
 
         double startTime = getRuntime();
         double currentTime = getRuntime();
@@ -269,10 +267,10 @@ public class TournamentTeleOp extends LinearOpMode {
                 telemetry.addData("error: ", error);
                 telemetry.update();
 
-                rightPower = power;
-                leftPower = power - Math.abs(steer);
+                rightPower = -power;
+                leftPower = -(power - Math.abs(steer));
 
-                if (leftPower < 0) {
+                if (leftPower > 0) {
                     leftPower = 0;
                 }
                 setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
@@ -281,10 +279,10 @@ public class TournamentTeleOp extends LinearOpMode {
                 telemetry.addData("error: ", error);
                 telemetry.update();
 
-                rightPower = power - Math.abs(steer);
-                leftPower = power;
+                rightPower = -(power - Math.abs(steer));
+                leftPower = -power;
 
-                if (rightPower < 0) {
+                if (rightPower > 0) {
                     rightPower = 0;
                 }
                 setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
@@ -293,8 +291,8 @@ public class TournamentTeleOp extends LinearOpMode {
                 telemetry.addData("error: ", error);
                 telemetry.update();
 
-                rightPower = power;
-                leftPower = power;
+                rightPower = -power;
+                leftPower = -power;
 
                 setDriveMotorPower(leftPower, leftPower, rightPower, rightPower);
             }

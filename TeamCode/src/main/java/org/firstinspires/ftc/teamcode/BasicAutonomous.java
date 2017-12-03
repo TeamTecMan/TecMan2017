@@ -150,7 +150,7 @@ public class BasicAutonomous extends LinearOpMode {
 
         //Split code into 2 teams
         if (teamColor.equals("blueOpposite")) {
-            gyroDriveByTime(0.1, 0.75, 0, 0.3);
+            gyroDriveByTime(0.1, 0.5, 0, 0.3);
             // turn to cryptobox
             pivotRobotByGyro("cClockwise", 70, 0.1);
             //leave platform
@@ -172,7 +172,7 @@ public class BasicAutonomous extends LinearOpMode {
         }
 
         if (teamColor.equals("redOpposite")) {
-            gyroDriveByTime(0.1, 0.75, 0, 0.3);
+            gyroDriveByTime(0.1, 0.5, 0, 0.3);
             // turn to cryptobox
             pivotRobotByGyro("clockwise", -70, 0.1);
             //leave platform
@@ -194,7 +194,7 @@ public class BasicAutonomous extends LinearOpMode {
         }
 
         if (teamColor.equals("blueRecovery")){
-            gyroDriveByTime(0.1, 0.75, 0, 0.3);
+            gyroDriveByTime(0.1, 0.5, 0, 0.3);
             //turn to point off platform
             pivotRobotByGyro("cClockwise", 75, 0.1);
             //drive off platform
@@ -220,7 +220,7 @@ public class BasicAutonomous extends LinearOpMode {
         }
 
         if (teamColor.equals("redRecovery")){
-            gyroDriveByTime(0.1, 0.75, 0, 0.3);
+            gyroDriveByTime(0.1, 0.5, 0, 0.3);
             //turn to point off platform
             pivotRobotByGyro("clockwise", -75, 0.1);
             //drive off platform
